@@ -2,8 +2,14 @@
     <string name="app_name">WeatherEdu</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_title">Ivan D</string>
+    <string name="nav_header_subtitle">div-3@mail.ru</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+    <string name="nav_drawer_Show_item">Show City…</string>
+    <string name="nav_drawer_Add_item">Add City</string>
+    <string name="nav_drawer_All_Cities_item">All Cities</string>
+    <string name="nav_drawer_Settings_item">Settings</string>
+    <string name="nav_drawer_Share_item">Share</string>
+    <string name="main_choose">Choose your City…</string>
 </resources>

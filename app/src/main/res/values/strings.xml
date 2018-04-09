@@ -12,4 +12,20 @@
     <string name="nav_drawer_Settings_item">Settings</string>
     <string name="nav_drawer_Share_item">Share</string>
     <string name="main_choose">Choose your City…</string>
+    <string name="city">City</string>
+    <string name="temperature_default">-</string>
+    <string name="temperature_unit">\u00B0C</string>
+    <string name="pressure_tag">Pressure:</string>
+    <string name="pressure_default">-</string>
+    <string name="pressure_unit">mmHg</string>
+    <string name="humidity_tag">Humidity:</string>
+    <string name="humidity_default">-</string>
+    <string name="humidity_unit">%</string>
+    <string name="wind_tag">wind:</string>
+    <string name="wind_default">-</string>
+    <string name="wind_unit">m/s:</string>
+
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

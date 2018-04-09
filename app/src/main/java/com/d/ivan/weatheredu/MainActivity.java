@@ -1,8 +1,10 @@
 package com.d.ivan.weatheredu;
 
+
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,7 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, FragmentMainCurrentCityWeather.OnCurrentCityChangeListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +25,12 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //Загрузка начального фрагмента
+        FragmentTransaction ftrans = getSupportFragmentManager().beginTransaction();
+        ftrans.add(R.id.frameLayoutForFragment, new FragmentMainCurrentCityWeather());
+        ftrans.commit();
+
+        //Обработка FAB
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,5 +105,11 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    //Метод обработки ошибки загрузки данных во фрагменте.
+    @Override
+    public void onCityWeatherLoadError(String currentCity) {
+
     }
 }

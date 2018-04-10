@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -17,9 +19,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, FragmentMainCurrentCityWeather.OnCurrentCityChangeListener{
+        implements  NavigationView.OnNavigationItemSelectedListener,
+                    FragmentMainCurrentCityWeather.OnCurrentCityChangeListener,
+                    FragmentChangeCity.OnCityChangeListener{
 
     private DialogFragment dialogFragment;
+    private FragmentMainCurrentCityWeather fragmentMainCurrentCityWeather;
+    private final static String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,10 +35,11 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         dialogFragment = new FragmentChangeCity();
+        fragmentMainCurrentCityWeather =new FragmentMainCurrentCityWeather();
 
         //Загрузка начального фрагмента
         FragmentTransaction ftrans = getSupportFragmentManager().beginTransaction();
-        ftrans.add(R.id.frameLayoutForFragment, new FragmentMainCurrentCityWeather());
+        ftrans.add(R.id.frameLayoutForFragment, fragmentMainCurrentCityWeather);
         ftrans.commit();
 
         //Обработка FAB
@@ -41,7 +48,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
 
-//                dialogFragment.show(getSupportFragmentManager(), "changeCity");
+                dialogFragment.show(getSupportFragmentManager(), "changeCity");
 
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
@@ -119,5 +126,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onCityWeatherLoadError(String currentCity) {
 
+    }
+
+    @Override
+    public void onCityChanged(String newCity) {
+        Log.d(TAG, "onCityChanged: New City: " + newCity);
+        fragmentMainCurrentCityWeather.updateWeatherData(newCity);
     }
 }

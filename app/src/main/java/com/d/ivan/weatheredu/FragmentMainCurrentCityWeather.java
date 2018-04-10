@@ -42,7 +42,8 @@ public class FragmentMainCurrentCityWeather extends Fragment {
         public void onCityWeatherLoadError(String currentCity);
     }
 
-    OnCurrentCityChangeListener mCallback;  //Создание экземпляра интерфейса для передачи данных в callback'е активности
+    //Создание экземпляра интерфейса для передачи данных в callback'е активности
+    OnCurrentCityChangeListener mCallback;
 
 
     //Привязка к разметке
@@ -71,7 +72,7 @@ public class FragmentMainCurrentCityWeather extends Fragment {
     }
 
     //Обновление/загрузка погодных данных
-    private void updateWeatherData(final String city) {
+    public void updateWeatherData(final String city) {
         new Thread() {//Отдельный поток для получения новых данных в фоне
             public void run() {
                 //Получение и парсинг данных от сервера в модель

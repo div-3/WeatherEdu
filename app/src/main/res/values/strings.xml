@@ -14,18 +14,22 @@
     <string name="main_choose">Choose your City…</string>
     <string name="city">City</string>
     <string name="temperature_default">-</string>
-    <string name="temperature_unit">\u00B0C</string>
-    <string name="pressure_tag">Pressure:</string>
+    <string name="temperature_unit"> \u00B0C</string>
+    <string name="pressure_tag">Pressure: </string>
     <string name="pressure_default">-</string>
-    <string name="pressure_unit">mmHg</string>
+    <string name="pressure_unit">hPa</string>
     <string name="humidity_tag">Humidity:</string>
     <string name="humidity_default">-</string>
     <string name="humidity_unit">%</string>
-    <string name="wind_tag">wind:</string>
+    <string name="wind_tag">Wind:</string>
     <string name="wind_default">-</string>
-    <string name="wind_unit">m/s:</string>
+    <string name="wind_unit">m/s</string>
+    <string name="place_not_found">Place not found!</string>
+
 
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="btn_ok">Ok</string>
+    <string name="bnt_cancel">Cancel</string>
 </resources>

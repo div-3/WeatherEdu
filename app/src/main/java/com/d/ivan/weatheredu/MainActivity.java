@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity
     private DialogFragment dialogFragment;
     private FragmentMainCurrentCityWeather fragmentMainCurrentCityWeather;
     private final static String TAG = "MainActivity";
+	private final static String TAG2 = "asfasf";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

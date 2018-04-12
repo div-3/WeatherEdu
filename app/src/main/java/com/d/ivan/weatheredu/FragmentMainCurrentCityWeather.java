@@ -20,6 +20,9 @@ import java.util.Date;
 import java.util.Locale;
 
 
+// Взаимодействие с родительской активити через callback интерфейс.
+// Туториал Communicating with Other Fragments https://developer.android.com/training/basics/fragments/communicating.html
+
 public class FragmentMainCurrentCityWeather extends Fragment {
 
     // Handler - это класс, позволяющий отправлять и обрабатывать сообщения и объекты runnable. Он используется в двух

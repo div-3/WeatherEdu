@@ -1,6 +1,7 @@
 package com.d.ivan.weatheredu;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -38,6 +39,10 @@ public class FragmentMainCurrentCityWeather extends Fragment {
     private TextView tvHumidityValue;
     private TextView tvWindValue;
 
+    private String currentCity;
+    private final String CURRENT_CITY_KEY_VALUE = "CURRENT_CITY";
+    private final String DEFAULT_CITY = "CURRENT_CITY";
+
     private static final String TAG = "FrCurrCityWeather";
 
     //Определяем интерфейс для связи фрагмента с активностью
@@ -53,6 +58,15 @@ public class FragmentMainCurrentCityWeather extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        //Загрузка ранее выбранного города или сохранённого из SharedPreferences
+        if (currentCity == null) {
+            String tmp = loadSharedCrypto(CURRENT_CITY_KEY_VALUE);
+            if (tmp != null){
+                updateWeatherData(tmp);
+            }
+        } else {
+            updateWeatherData(currentCity);
+        }
         return inflater.inflate(R.layout.fragment_main_current_city_weather, container, false);
     }
 
@@ -79,7 +93,7 @@ public class FragmentMainCurrentCityWeather extends Fragment {
         new Thread() {//Отдельный поток для получения новых данных в фоне
             public void run() {
                 //Получение и парсинг данных от сервера в модель
-                final CityCurrentWeatherModel model = CurrentWeatherDataLoader.getCurrentWeatherByCityName(getActivity().getApplicationContext(), city);
+                final CityCurrentWeatherModel model = CurrentWeatherDataLoader.getCurrentWeatherByCityName(city);
 
                 // Вызов методов напрямую может вызвать runtime error
                 // Мы не можем напрямую обновить UI, поэтому используем handler, чтобы обновить интерфейс в главном потоке.
@@ -92,8 +106,16 @@ public class FragmentMainCurrentCityWeather extends Fragment {
                         }
                     });
                 } else {
+
+
+
+                    //Отрисовка информации о выбранном городе
                     handler.post(new Runnable() {
                         public void run() {
+                            //Сохранение названия города в SharedPreferences
+                            currentCity = model.name;
+                            storeToSharedCrypto(CURRENT_CITY_KEY_VALUE, currentCity);
+
                             renderWeather(model);
                         }
                     });
@@ -140,13 +162,41 @@ public class FragmentMainCurrentCityWeather extends Fragment {
         tvHumidityValue = (TextView) getActivity().findViewById(R.id.tvHumidityValue);
         tvWindValue = (TextView) getActivity().findViewById(R.id.tvWindValue);
 
-        ib.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                updateWeatherData("Paris");
-            }
-        });
-
-        updateWeatherData("London");
+//        //Загрузка ранее выбранного города или сохранённого из SharedPreferences
+//        if (currentCity == null) {
+//            String tmp = loadSharedCrypto(CURRENT_CITY_KEY_VALUE);
+//            if (tmp != null){
+//                updateWeatherData(tmp);
+//            }
+//        } else {updateWeatherData(currentCity);}
     }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+    }
+
+    //Метод сохранения данных в указанном файле SharedPreferences по указанному ключу
+    private boolean storeToSharedCrypto(String keyValue, String dataValue){
+
+        if (keyValue.isEmpty() || dataValue.isEmpty()) return false;
+
+        SharedPreferences sPrefs = getActivity().getSharedPreferences("FragmentMainCurrentWeatherData", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sPrefs.edit();
+        editor.putString(keyValue, dataValue);
+        editor.commit();
+        return true;
+    }
+
+    //Метод получения данных из указанного файла SharedPreferences по указанному ключу
+    private String loadSharedCrypto(String keyValue){
+
+        if (keyValue.isEmpty()) return null;
+
+        SharedPreferences sPrefs = getActivity().getSharedPreferences("FragmentMainCurrentWeatherData", Context.MODE_PRIVATE);
+
+        return sPrefs.getString(keyValue, null);
+    }
+
 }

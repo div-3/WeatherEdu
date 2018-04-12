@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity
 
         //Загрузка начального фрагмента
         FragmentTransaction ftrans = getSupportFragmentManager().beginTransaction();
-        ftrans.add(R.id.frameLayoutForFragment, fragmentMainCurrentCityWeather);
+        ftrans.replace(R.id.frameLayoutForFragment, fragmentMainCurrentCityWeather);
         ftrans.commit();
 
         //Обработка FAB

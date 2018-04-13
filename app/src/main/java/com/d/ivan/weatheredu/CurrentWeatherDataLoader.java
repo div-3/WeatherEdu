@@ -58,7 +58,7 @@ public class CurrentWeatherDataLoader {
             }
             return model;
 
-            //Обработка, если получили ошибку при запросе.
+        //Обработка, если получили ошибку при запросе.
         } catch (Exception e) {
             e.printStackTrace();
             return null; //FIXME Обработка ошибки

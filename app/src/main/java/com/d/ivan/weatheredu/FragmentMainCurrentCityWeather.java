@@ -6,20 +6,18 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.AppCompatImageView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.d.ivan.weatheredu.Model.CityCurrentWeatherModel;
-import com.squareup.picasso.Picasso;
-
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.Locale;
+
 
 
 // Взаимодействие с родительской активити через callback интерфейс.
@@ -33,7 +31,7 @@ public class FragmentMainCurrentCityWeather extends Fragment {
     private final Handler handler = new Handler();
 
     //Вьюшки
-    private AppCompatImageView ib;
+    private ImageView iv;
     private TextView tvCity;
     private TextView tvCurrentTempValue;
     private TextView tvPressureValue;
@@ -146,8 +144,8 @@ public class FragmentMainCurrentCityWeather extends Fragment {
 //            DateFormat df = DateFormat.getDateTimeInstance();
 //            String updatedOn = df.format(new Date(model.dt * 1000));    //Точное время обновления информации от сервера
 //            updatedTextView.setText("Last update: " + updatedOn);
-            if (model.weather.icon != null) {
-                setWeatherIcon(model.weather.icon);
+            if (model.weather.get(0).icon != null) {
+                setWeatherIcon(model.weather.get(0).icon);
             }
 
         } catch (Exception e) {
@@ -158,7 +156,7 @@ public class FragmentMainCurrentCityWeather extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ib = (AppCompatImageView) getActivity().findViewById(R.id.ivIco);
+        iv = (ImageView) getActivity().findViewById(R.id.ivIco);
         tvCity = (TextView) getActivity().findViewById(R.id.tvCity);
         tvCurrentTempValue = (TextView) getActivity().findViewById(R.id.tvCurrentTempValue);
         tvPressureValue = (TextView) getActivity().findViewById(R.id.tvPressureValue);
@@ -202,10 +200,14 @@ public class FragmentMainCurrentCityWeather extends Fragment {
         return sPrefs.getString(keyValue, null);
     }
 
+    //Вывод иконки погоды с сайта в ImageView с помощью библиотеки Glide
     private boolean setWeatherIcon(String ico){
-//        Picasso.with(context).load("http://i.imgur.com/DvpvklR.png").into(imageView);
+
         if (!ico.isEmpty()){
-            Log.d(TAG, "setWeatherIcon: " + ico);
+            String tempURL = "http://openweathermap.org/img/w/" + ico + ".png";
+            Glide.with(getActivity().getBaseContext())
+                    .load(tempURL)
+                    .into(iv);
         }
         return false;
     }

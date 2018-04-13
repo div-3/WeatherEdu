@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.d.ivan.weatheredu.Model.CityCurrentWeatherModel;
+import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -90,38 +91,39 @@ public class FragmentMainCurrentCityWeather extends Fragment {
 
     //Обновление/загрузка погодных данных
     public void updateWeatherData(final String city) {
-        new Thread() {//Отдельный поток для получения новых данных в фоне
-            public void run() {
-                //Получение и парсинг данных от сервера в модель
-                final CityCurrentWeatherModel model = CurrentWeatherDataLoader.getCurrentWeatherByCityName(city);
 
-                // Вызов методов напрямую может вызвать runtime error
-                // Мы не можем напрямую обновить UI, поэтому используем handler, чтобы обновить интерфейс в главном потоке.
+        if (!city.isEmpty()) {
+            currentCity = city;
 
-                if (model == null) {
-                    handler.post(new Runnable() {
-                        public void run() {
-                            Toast.makeText(getActivity().getApplicationContext(), getString(R.string.place_not_found),
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    });
-                } else {
+            //Сохранение названия города в SharedPreferences
+            storeToSharedCrypto(CURRENT_CITY_KEY_VALUE, currentCity);
 
+            new Thread() {//Отдельный поток для получения новых данных в фоне
+                public void run() {
+                    //Получение и парсинг данных от сервера в модель
+                    final CityCurrentWeatherModel model = CurrentWeatherDataLoader.getCurrentWeatherByCityName(city);
 
+                    // Вызов методов напрямую может вызвать runtime error
+                    // Мы не можем напрямую обновить UI, поэтому используем handler, чтобы обновить интерфейс в главном потоке.
+                    if (model == null) {
+                        handler.post(new Runnable() {
+                            public void run() {
+                                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.place_not_found),
+                                        Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    } else {
 
-                    //Отрисовка информации о выбранном городе
-                    handler.post(new Runnable() {
-                        public void run() {
-                            //Сохранение названия города в SharedPreferences
-                            currentCity = model.name;
-                            storeToSharedCrypto(CURRENT_CITY_KEY_VALUE, currentCity);
-
-                            renderWeather(model);
-                        }
-                    });
+                        //Отрисовка информации о выбранном городе
+                        handler.post(new Runnable() {
+                            public void run() {
+                                renderWeather(model);
+                            }
+                        });
+                    }
                 }
-            }
-        }.start();
+            }.start();
+        }
     }
 
     //Обработка загруженных данных и обновление UI
@@ -144,8 +146,9 @@ public class FragmentMainCurrentCityWeather extends Fragment {
 //            DateFormat df = DateFormat.getDateTimeInstance();
 //            String updatedOn = df.format(new Date(model.dt * 1000));    //Точное время обновления информации от сервера
 //            updatedTextView.setText("Last update: " + updatedOn);
-//            setWeatherIcon(id, model.sys.sunrise * 1000,
-//                    model.sys.sunset * 1000);
+            if (model.weather.icon != null) {
+                setWeatherIcon(model.weather.icon);
+            }
 
         } catch (Exception e) {
             Log.d(TAG, "One or more fields not found in the JSON data");//FIXME Обработка ошибки
@@ -199,4 +202,11 @@ public class FragmentMainCurrentCityWeather extends Fragment {
         return sPrefs.getString(keyValue, null);
     }
 
+    private boolean setWeatherIcon(String ico){
+//        Picasso.with(context).load("http://i.imgur.com/DvpvklR.png").into(imageView);
+        if (!ico.isEmpty()){
+            Log.d(TAG, "setWeatherIcon: " + ico);
+        }
+        return false;
+    }
 }

@@ -10,4 +10,5 @@ public class CityCurrentWeatherModel {
     public CurrentWind wind;
     public long cod;
     public CurrentSys sys;
+    public CurrentWeatherWeather weather;
 }

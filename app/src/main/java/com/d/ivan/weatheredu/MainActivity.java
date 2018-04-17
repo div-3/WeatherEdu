@@ -18,7 +18,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.squareup.picasso.Picasso;
+import com.d.ivan.weatheredu.DB.WeatherDataSource;
+
 
 public class MainActivity extends AppCompatActivity
         implements  NavigationView.OnNavigationItemSelectedListener,
@@ -28,11 +29,18 @@ public class MainActivity extends AppCompatActivity
     private DialogFragment dialogFragment;
     private FragmentMainCurrentCityWeather fragmentMainCurrentCityWeather;
     private final static String TAG = "MainActivity";
-	private final static String TAG2 = "asfasf";
+
+    //Для работы с БД
+    private WeatherDataSource weatherDataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Создаём объект источника данных для БД
+        weatherDataSource = new WeatherDataSource(this);
+        weatherDataSource.open();
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -131,6 +139,14 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    //Метд обновления данных в БД по callback'у из фрагмента
+    @Override
+    public void updateCityDataToDB(String city, String country, float temp, float pressure, float humidity, float wind) {
+        weatherDataSource.updateWeather(city,country,temp,pressure,humidity,wind);
+    }
+
+
+    //Метод передаёт название города во фрагмент для отображения
     @Override
     public void onCityChanged(String newCity) {
         Log.d(TAG, "onCityChanged: New City: " + newCity);

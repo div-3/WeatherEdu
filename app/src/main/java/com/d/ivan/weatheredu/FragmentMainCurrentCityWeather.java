@@ -47,6 +47,8 @@ public class FragmentMainCurrentCityWeather extends Fragment {
     //Определяем интерфейс для связи фрагмента с активностью
     public interface OnCurrentCityChangeListener{
         public void onCityWeatherLoadError(String currentCity);
+        public void updateCityDataToDB(String city, String country, float temp,float pressure,
+                                       float humidity, float wind);
     }
 
     //Создание экземпляра интерфейса для передачи данных в callback'е активности
@@ -148,9 +150,18 @@ public class FragmentMainCurrentCityWeather extends Fragment {
                 setWeatherIcon(model.weather.get(0).icon);
             }
 
+            //Запись данных о городе в БД через callback
+            mCallback.updateCityDataToDB(model.name,
+                                        model.sys.country,
+                                        (float) model.main.temp,
+                                        (float) model.main.pressure,
+                                        (float)model.main.humidity,
+                                        (float) model.wind.speed);
+
         } catch (Exception e) {
             Log.d(TAG, "One or more fields not found in the JSON data");//FIXME Обработка ошибки
         }
+
     }
 
     @Override

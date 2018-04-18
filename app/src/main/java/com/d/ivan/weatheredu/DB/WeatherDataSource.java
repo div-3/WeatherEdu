@@ -76,9 +76,10 @@ public class WeatherDataSource {
                                float pressure,
                                float humidity,
                                float wind){
+
         ContentValues updatedWeather = new ContentValues();
 
-        updatedWeather.put(WeatherDBHelper.COLUMN_CITY, city);
+        //updatedWeather.put(WeatherDBHelper.COLUMN_CITY, city);
         updatedWeather.put(WeatherDBHelper.COLUMN_COUNTRY, country);
         updatedWeather.put(WeatherDBHelper.COLUMN_CURRENT_TEMP, temp);
         updatedWeather.put(WeatherDBHelper.COLUMN_PRESSURE, pressure);
@@ -86,11 +87,22 @@ public class WeatherDataSource {
         updatedWeather.put(WeatherDBHelper.COLUMN_WIND, wind);
 
         //Обновляем данные в БД. Метод update возвращает нам кол-во обновленных записей
-        long nbr = sqLiteDatabase.update(weatherDBHelper.TABLE_WEATHER,
-                updatedWeather,
-                weatherDBHelper.COLUMN_CITY + "=" + city,
-                null);
-        Log.d(TAG, "updateWeather: 111111111111111111111111111111111111111111111111111111111111111111");
+       int nbr = 0;
+        try {
+
+            //Этот вариант обновления записи почему-то не заработал.
+//           nbr = sqLiteDatabase.update(weatherDBHelper.TABLE_WEATHER,
+//                   updatedWeather,
+//                   weatherDBHelper.COLUMN_CITY + "=" + city,
+//                   null);
+            //Этот вариант обновления записи заработал нормально.
+            nbr = sqLiteDatabase.update(weatherDBHelper.TABLE_WEATHER,
+                    updatedWeather,
+                    weatherDBHelper.COLUMN_CITY + "=?",
+                    new String[]{city});
+       } catch (Exception e){
+           e.printStackTrace();
+       }
         //Если ни одной записи не было обновлено, то добавляем новый кортеж в таблицу БД
         if (nbr == 0){
             addWeatherData(city,country,temp,pressure,humidity,wind);

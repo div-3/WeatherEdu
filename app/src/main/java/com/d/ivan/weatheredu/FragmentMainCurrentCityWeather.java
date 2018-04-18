@@ -150,6 +150,7 @@ public class FragmentMainCurrentCityWeather extends Fragment {
                 setWeatherIcon(model.weather.get(0).icon);
             }
 
+
             //Запись данных о городе в БД через callback
             mCallback.updateCityDataToDB(model.name,
                                         model.sys.country,
@@ -159,7 +160,8 @@ public class FragmentMainCurrentCityWeather extends Fragment {
                                         (float) model.wind.speed);
 
         } catch (Exception e) {
-            Log.d(TAG, "One or more fields not found in the JSON data");//FIXME Обработка ошибки
+            e.printStackTrace();
+             Log.d(TAG, "One or more fields not found in the JSON data");//FIXME Обработка ошибки
         }
 
     }

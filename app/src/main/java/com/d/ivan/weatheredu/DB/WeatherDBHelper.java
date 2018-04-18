@@ -8,8 +8,8 @@ import android.util.Log;
 //Определяем специальный класс для работы с БД SQLite
 public class WeatherDBHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "weather.db"; // название бд
-    private static final int DATABASE_VERSION = 1; // версия базы данных
+    private static final String DATABASE_NAME = "weather4.db"; // название бд
+    private static final int DATABASE_VERSION = 2; // версия базы данных
     static final String TABLE_WEATHER = "weather"; // название таблицы в бд
 
     // названия столбцов

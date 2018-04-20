@@ -4,6 +4,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text="@string/choose_your_city"/>
     <ListView
         android:id="@+id/change_city_list_view"
         android:layout_width="match_parent"

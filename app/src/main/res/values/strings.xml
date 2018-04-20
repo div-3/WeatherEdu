@@ -25,6 +25,7 @@
     <string name="wind_default">-</string>
     <string name="wind_unit">m/s</string>
     <string name="place_not_found">Place not found!</string>
+    <string name="choose_your_city">Choose City...</string>
 
 
 

@@ -28,7 +28,7 @@ public class CurrentWeatherDataLoader {
 
 
     //Метод для получения данных от сервера
-    static CityCurrentWeatherModel getCurrentWeatherByCityName(String city) {
+    public static CityCurrentWeatherModel getCurrentWeatherByCityName(String city) {
         try {
             //Формируем URL для GET-запроса от сервера
             URL url = new URL(String.format(OPEN_WEATHER_MAP_API, city,KEY));

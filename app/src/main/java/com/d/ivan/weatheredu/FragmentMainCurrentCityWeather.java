@@ -25,8 +25,6 @@ import com.google.gson.GsonBuilder;
 
 import java.util.Locale;
 
-
-
 // Взаимодействие с родительской активити через callback интерфейс.
 // Туториал Communicating with Other Fragments https://developer.android.com/training/basics/fragments/communicating.html
 
@@ -50,7 +48,6 @@ public class FragmentMainCurrentCityWeather extends Fragment {
 
     private String currentCity;
     private final String CURRENT_CITY_KEY_VALUE = "CURRENT_CITY";
-    private final String DEFAULT_CITY = "CURRENT_CITY";
 
     //Для работы с сервисом
     private BroadcastReceiver br;   //BroadCastReceiver для работы с сервисом
@@ -61,8 +58,8 @@ public class FragmentMainCurrentCityWeather extends Fragment {
 
     //Определяем интерфейс для связи фрагмента с активностью
     public interface OnCurrentCityChangeListener{
-        public void onCityWeatherLoadError(String currentCity);
-        public void updateCityDataToDB(String city, String country, float temp,float pressure,
+        void onCityWeatherLoadError(String currentCity);
+        void updateCityDataToDB(String city, String country, float temp,float pressure,
                                        float humidity, float wind);
     }
 
@@ -135,9 +132,7 @@ public class FragmentMainCurrentCityWeather extends Fragment {
 
                             //Отрисовка информации о выбранном городе
                             handler.post(new Runnable() {
-                                public void run() {
-                                    renderWeather(model);
-                                }
+                                public void run() {renderWeather(model);}
                             });
                         }
                     }
@@ -145,12 +140,11 @@ public class FragmentMainCurrentCityWeather extends Fragment {
 
                     //Работа с сервисом для получения данных о погоде.
                     if (serviceMode){
-
                         //Запускаем сервис
-                        Intent intent = new Intent(getActivity(), WeatherLoaderService.class);  //Подготавливаем интент для подключения к сервису
-                        intent.putExtra("City", city);  //передаём в интент название города
+                        Intent intent = new Intent(getActivity(), WeatherLoaderService.class);      //Подготавливаем интент для подключения к сервису
+                        intent.putExtra("City", city);                                        //передаём в интент название города
                         try {
-                            getActivity().startService(intent); //запускаем сервис
+                            getActivity().startService(intent);                                     //запускаем сервис
                         } catch (Exception e){
                             e.printStackTrace();
                         }
@@ -159,7 +153,7 @@ public class FragmentMainCurrentCityWeather extends Fragment {
                         br = new BroadcastReceiver() {
                             @Override
                             public void onReceive(Context context, Intent intent) {
-                                String rawWeatherData = intent.getStringExtra(CITY);    //Получаем данные из BR
+                                String rawWeatherData = intent.getStringExtra(CITY);                //Получаем данные из BR
 
                                 final CityCurrentWeatherModel model = parseJsonWeatherData(rawWeatherData);   //Парсинг JSON-строки с погодой в модель
 
@@ -235,7 +229,7 @@ public class FragmentMainCurrentCityWeather extends Fragment {
 
         } catch (Exception e) {
             e.printStackTrace();
-             Log.d(TAG, "One or more fields not found in the JSON data");//FIXME Обработка ошибки
+             Log.d(TAG, "One or more fields not found in the JSON data");   //FIXME Обработка ошибки
         }
 
     }
@@ -317,7 +311,7 @@ public class FragmentMainCurrentCityWeather extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        closeService();
+        closeService();     //Остановка сервиса
     }
 
     //Закрытие сервиса

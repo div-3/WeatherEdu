@@ -60,7 +60,7 @@ public class FragmentChangeCity extends DialogFragment implements AdapterView.On
             mCallback = (OnCityChangeListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
-                    + " must implement OnHeadlineSelectedListener");
+                    + " must implement OnCityChangeListener");
         }
     }
 
@@ -70,6 +70,5 @@ public class FragmentChangeCity extends DialogFragment implements AdapterView.On
         dismiss();
         Log.d(TAG, "onItemClick: Selected Item: " + adapterView.getAdapter().getItem(i).toString());
         mCallback.onCityChanged(adapterView.getAdapter().getItem(i).toString());
-
     }
 }

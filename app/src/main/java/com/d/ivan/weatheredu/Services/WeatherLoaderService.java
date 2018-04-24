@@ -12,12 +12,13 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+///////////////////////////////////////////////////////////////////////////
+// Сервис для загрузки погодных данных от сервера и возврату их через BroadcastReceiver
+///////////////////////////////////////////////////////////////////////////
+
 public class WeatherLoaderService extends IntentService {
     private static final String OPEN_WEATHER_MAP_API = "http://api.openweathermap.org/data/2.5/weather?q=%s&units=metric%s";
     private static final String KEY = "&appid=54acf73196d5575a01ed032b905f8eaa";    //API-ключ для доступа к серверу http://api.openweathermap.org
-
-
-
 
 
     public WeatherLoaderService() {
@@ -44,7 +45,7 @@ public class WeatherLoaderService extends IntentService {
             //Вытаскиваем JSON-строку с погодными данными из ответа
             String rawCurrentWeatherData = response.body().string();
 
-            //Если строка не нулевая, то отправляем её широковещательно
+            //Если строка не нулевая, то отправляем её широковещательно на BroadcastReceiver
             if (!rawCurrentWeatherData.isEmpty()){
                 Intent sendMSG = new Intent();
                 sendMSG.setAction(FragmentMainCurrentCityWeather.BROADCAST_ACTION);
@@ -54,7 +55,6 @@ public class WeatherLoaderService extends IntentService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return; //FIXME Обработка ошибки
         }
 
     }

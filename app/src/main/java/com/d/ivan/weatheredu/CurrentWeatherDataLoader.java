@@ -6,9 +6,7 @@ package com.d.ivan.weatheredu;
 // Для GET запросов используется библиотека OkHttp
 ///////////////////////////////////////////////////////////////////////////
 
-import android.content.Context;
 import android.util.Log;
-
 import com.d.ivan.weatheredu.Model.CityCurrentWeatherModel;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

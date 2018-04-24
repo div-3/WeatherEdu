@@ -4,8 +4,6 @@ package com.d.ivan.weatheredu;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
@@ -58,9 +56,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 dialogFragment.show(getSupportFragmentManager(), "changeCity");
-
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
             }
@@ -135,16 +131,13 @@ public class MainActivity extends AppCompatActivity
 
     //Метод обработки ошибки загрузки данных во фрагменте.
     @Override
-    public void onCityWeatherLoadError(String currentCity) {
-
-    }
+    public void onCityWeatherLoadError(String currentCity) {}
 
     //Метд обновления данных в БД по callback'у из фрагмента
     @Override
     public void updateCityDataToDB(String city, String country, float temp, float pressure, float humidity, float wind) {
         weatherDataSource.updateWeather(city,country,temp,pressure,humidity,wind);
     }
-
 
     //Метод передаёт название города во фрагмент для отображения
     @Override

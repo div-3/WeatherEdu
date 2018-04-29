@@ -19,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.d.ivan.weatheredu.DB.WeatherDataSource;
+import com.d.ivan.weatheredu.Model.CityCurrentWeatherModel;
 
 
 public class MainActivity extends AppCompatActivity
@@ -58,9 +59,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 dialogFragment.show(getSupportFragmentManager(), "changeCity");
-
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
             }
@@ -139,10 +138,16 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    //Метд обновления данных в БД по callback'у из фрагмента
+    //Метод обновления данных в БД по callback'у из фрагмента
     @Override
     public void updateCityDataToDB(String city, String country, float temp, float pressure, float humidity, float wind) {
         weatherDataSource.updateWeather(city,country,temp,pressure,humidity,wind);
+    }
+
+    //Метод для получения данных из БД в оффлайне по последнему названию.
+    @Override
+    public CityCurrentWeatherModel getWeatherDataFromDBOffline(String name) {
+        return weatherDataSource.getCityWeatherDataFromDBByName(name);
     }
 
 

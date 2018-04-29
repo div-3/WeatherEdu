@@ -7,6 +7,9 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.d.ivan.weatheredu.Model.CityCurrentWeatherModel;
+import com.d.ivan.weatheredu.Model.CurrentWeatherWeather;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -124,6 +127,32 @@ public class WeatherDataSource {
         // Обязательно закрыть курсор
         cursor.close();
         return weatherData;
+    }
+
+    //Возврат модели  годода из БД.
+    public CityCurrentWeatherModel getCityWeatherDataFromDBByName(String name){
+        CityCurrentWeatherModel model = new CityCurrentWeatherModel();
+
+        Cursor cursor = sqLiteDatabase.query(weatherDBHelper.TABLE_WEATHER,
+                allWeatherColumns, weatherDBHelper.COLUMN_CITY + "=?",
+                new String[]{name}, null, null, null);
+
+        if (cursor.getCount() != 0) {
+            cursor.moveToFirst();
+            WeatherData weatherDataTemp = cursorToWeather(cursor);
+            model.name = weatherDataTemp.getCity();
+            model.wind.speed = weatherDataTemp.getWind();
+            model.main.temp = weatherDataTemp.getTemp();
+            model.main.humidity = weatherDataTemp.getHumidity();
+            model.main.pressure = weatherDataTemp.getPressure();
+            model.cod = weatherDataTemp.getId();
+            model.sys.country = weatherDataTemp.getCountry();
+//            model.weather.add(0,new CurrentWeatherWeather());
+//            model.weather.get(0).icon = weatherDataTemp.getId();
+        }
+        // Обязательно закрыть курсор
+        cursor.close();
+        return model;
     }
 
     private WeatherData cursorToWeather(Cursor cursor) {

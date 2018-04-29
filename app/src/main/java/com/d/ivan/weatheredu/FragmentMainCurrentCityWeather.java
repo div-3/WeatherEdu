@@ -64,6 +64,7 @@ public class FragmentMainCurrentCityWeather extends Fragment {
         public void onCityWeatherLoadError(String currentCity);
         public void updateCityDataToDB(String city, String country, float temp,float pressure,
                                        float humidity, float wind);
+        public CityCurrentWeatherModel getWeatherDataFromDBOffline(String name);
     }
 
     //Создание экземпляра интерфейса для передачи данных в callback'е активности
@@ -74,16 +75,55 @@ public class FragmentMainCurrentCityWeather extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+//        //Загрузка ранее выбранного города или сохранённого из SharedPreferences
+//        if (currentCity == null) {
+//            String tmp = loadSharedCrypto(CURRENT_CITY_KEY_VALUE);
+//            if (tmp != null){
+//                CityCurrentWeatherModel model = mCallback.getWeatherDataFromDBOffline(tmp);
+//                renderWeather(model);
+////                updateWeatherData(tmp);
+//            }
+//        } else {
+//            updateWeatherData(currentCity);
+//        }
+        return inflater.inflate(R.layout.fragment_main_current_city_weather, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        iv = (ImageView) getActivity().findViewById(R.id.ivIco);
+        tvCity = (TextView) getActivity().findViewById(R.id.tvCity);
+        tvCurrentTempValue = (TextView) getActivity().findViewById(R.id.tvCurrentTempValue);
+        tvPressureValue = (TextView) getActivity().findViewById(R.id.tvPressureValue);
+        tvHumidityValue = (TextView) getActivity().findViewById(R.id.tvHumidityValue);
+        tvWindValue = (TextView) getActivity().findViewById(R.id.tvWindValue);
+
         //Загрузка ранее выбранного города или сохранённого из SharedPreferences
         if (currentCity == null) {
             String tmp = loadSharedCrypto(CURRENT_CITY_KEY_VALUE);
             if (tmp != null){
-                updateWeatherData(tmp);
+                CityCurrentWeatherModel model = mCallback.getWeatherDataFromDBOffline(tmp);
+                renderWeather(model);
+//                updateWeatherData(tmp);
             }
         } else {
             updateWeatherData(currentCity);
         }
-        return inflater.inflate(R.layout.fragment_main_current_city_weather, container, false);
+
+
+//        //Загрузка ранее выбранного города или сохранённого из SharedPreferences
+//        if (currentCity == null) {
+//            String tmp = loadSharedCrypto(CURRENT_CITY_KEY_VALUE);
+//            if (tmp != null){
+//                updateWeatherData(tmp);
+//            }
+//        } else {updateWeatherData(currentCity);}
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
     }
 
 
@@ -97,6 +137,12 @@ public class FragmentMainCurrentCityWeather extends Fragment {
         } catch (ClassCastException cce){
             throw new ClassCastException(context.toString() + " must implement OnCurrentCityChangeListener");
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        closeService();
     }
 
     //Callback для активности, если что-то произошло при загрузке данных
@@ -215,7 +261,8 @@ public class FragmentMainCurrentCityWeather extends Fragment {
 
             tvPressureValue.setText(String.valueOf(model.main.pressure));
             tvHumidityValue.setText(String.valueOf(model.main.humidity));
-            tvWindValue.setText(String.valueOf(model.wind.speed));
+//            tvWindValue.setText(String.valueOf(model.wind.speed));
+            tvWindValue.setText(String.format("%.1f", model.wind.speed));
             tvCurrentTempValue.setText(String.format("%.1f", model.main.temp));
 
 //            DateFormat df = DateFormat.getDateTimeInstance();
@@ -237,31 +284,6 @@ public class FragmentMainCurrentCityWeather extends Fragment {
             e.printStackTrace();
              Log.d(TAG, "One or more fields not found in the JSON data");//FIXME Обработка ошибки
         }
-
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        iv = (ImageView) getActivity().findViewById(R.id.ivIco);
-        tvCity = (TextView) getActivity().findViewById(R.id.tvCity);
-        tvCurrentTempValue = (TextView) getActivity().findViewById(R.id.tvCurrentTempValue);
-        tvPressureValue = (TextView) getActivity().findViewById(R.id.tvPressureValue);
-        tvHumidityValue = (TextView) getActivity().findViewById(R.id.tvHumidityValue);
-        tvWindValue = (TextView) getActivity().findViewById(R.id.tvWindValue);
-
-//        //Загрузка ранее выбранного города или сохранённого из SharedPreferences
-//        if (currentCity == null) {
-//            String tmp = loadSharedCrypto(CURRENT_CITY_KEY_VALUE);
-//            if (tmp != null){
-//                updateWeatherData(tmp);
-//            }
-//        } else {updateWeatherData(currentCity);}
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
 
     }
 
@@ -312,12 +334,6 @@ public class FragmentMainCurrentCityWeather extends Fragment {
             return null;
         }
         return model;
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        closeService();
     }
 
     //Закрытие сервиса

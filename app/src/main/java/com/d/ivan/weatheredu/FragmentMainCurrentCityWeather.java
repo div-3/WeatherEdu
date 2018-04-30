@@ -1,10 +1,6 @@
 package com.d.ivan.weatheredu;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -15,14 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.d.ivan.weatheredu.commonMethods.CommonMethods;
 import com.d.ivan.weatheredu.model.CityCurrentWeatherModel;
-import com.d.ivan.weatheredu.services.WeatherLoaderService;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.util.Locale;
 
@@ -36,6 +27,10 @@ public class FragmentMainCurrentCityWeather extends Fragment {
     // выполнение какого-то метода. Второй случай наш.
     private final Handler handler = new Handler();
 
+    private DataAdapter dataAdapter;                    //Адаптер для работы с данными.
+
+    private CityCurrentWeatherModel cityModel;          //Модель города для отображения во фрагменте
+    private int pageId;                                 //Номер фрагмента в ViewPager
 
     //Вьюшки
     private ImageView iv;
@@ -48,9 +43,6 @@ public class FragmentMainCurrentCityWeather extends Fragment {
     private String currentCity;
 
     private final String DEFAULT_CITY = "CURRENT_CITY";
-
-
-
 
     private static final String TAG = "FrCurrCityWeather";
 
@@ -66,13 +58,19 @@ public class FragmentMainCurrentCityWeather extends Fragment {
     OnCurrentCityChangeListener mCallback;
 
     //Метод создания фрагмента для ViewPager
-    public static FragmentMainCurrentCityWeather newInstance (String city){
+    public static FragmentMainCurrentCityWeather newInstance (DataAdapter da, int id, String city){
         FragmentMainCurrentCityWeather fragmentMainCurrentCityWeather = new FragmentMainCurrentCityWeather();
         Bundle args = new Bundle();
         args.putString(MainActivity.CURRENT_CITY_KEY_VALUE, city);
         fragmentMainCurrentCityWeather.setArguments(args);
+        fragmentMainCurrentCityWeather.setDataAdapter(da);
+        fragmentMainCurrentCityWeather.setPageId(id);
         return fragmentMainCurrentCityWeather;
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    //Override
+    ///////////////////////////////////////////////////////////////////////////
 
     //Привязка к разметке
     @Nullable
@@ -159,6 +157,27 @@ public class FragmentMainCurrentCityWeather extends Fragment {
         super.onPause();
     }
 
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Setters and Getters
+    ///////////////////////////////////////////////////////////////////////////
+
+    public void setDataAdapter(DataAdapter dataAdapter) {
+        this.dataAdapter = dataAdapter;
+    }
+
+    public void setCityModel(CityCurrentWeatherModel cityModel) {
+        this.cityModel = cityModel;
+    }
+
+    public void setPageId(int pageId) {
+        this.pageId = pageId;
+    }
+
+    public CityCurrentWeatherModel getCityModel() {
+        return cityModel;
+    }
+
     //Callback для активности, если что-то произошло при загрузке данных
     public void smthWrongHappend(String currentCity){
         mCallback.onCityWeatherLoadError(currentCity);
@@ -169,11 +188,11 @@ public class FragmentMainCurrentCityWeather extends Fragment {
 
         if (!city.isEmpty()) {
 //            currentCity = city;
-
+            setCityModel(dataAdapter.getCityModel(pageId, city));
             //Сохранение названия города в SharedPreferences
 //            CommonMethods.storeToSharedCrypto(getActivity(), MainActivity.CURRENT_CITY_KEY_VALUE, currentCity);
 
-            if (model == null) {
+            if (getCityModel() == null) {
 //                                handler.post(new Runnable() {
 //                                    public void run() {
 //                                        Toast.makeText(getActivity().getApplicationContext(), getString(R.string.place_not_found),
@@ -184,7 +203,7 @@ public class FragmentMainCurrentCityWeather extends Fragment {
                 //Отрисовка информации о выбранном городе
                 handler.post(new Runnable() {
                     public void run() {
-                        renderWeather(model);
+                        renderWeather(getCityModel());
                     }
                 });
             }

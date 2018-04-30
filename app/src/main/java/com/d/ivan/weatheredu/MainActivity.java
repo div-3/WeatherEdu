@@ -3,31 +3,26 @@ package com.d.ivan.weatheredu;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
-import android.view.View;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
-import com.d.ivan.weatheredu.commonMethods.CommonMethods;
-import com.d.ivan.weatheredu.db.WeatherDataSource;
 import com.d.ivan.weatheredu.model.CityCurrentWeatherModel;
 import com.d.ivan.weatheredu.viewPager.MyPagerAdapter;
 
 
 public class MainActivity extends AppCompatActivity
         implements  NavigationView.OnNavigationItemSelectedListener,
-                    FragmentMainCurrentCityWeather.OnCurrentCityChangeListener,
-                    FragmentChangeCity.OnCityChangeListener{
+                    FragmentMainCurrentCityWeather.OnCurrentCityChangeListener{
 
     private DialogFragment dialogFragment;
     private FragmentMainCurrentCityWeather fragmentMainCurrentCityWeather;
@@ -38,41 +33,32 @@ public class MainActivity extends AppCompatActivity
     private ViewPager viewPager;
     private PagerAdapter pagerAdapter;
 
-    //Для работы с БД
-    private WeatherDataSource weatherDataSource;
+    //Для работы с данными
+    private DataAdapter dataAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //Создаём объект источника данных для БД
-        weatherDataSource = new WeatherDataSource(this);
-        weatherDataSource.open();
+        dataAdapter = new DataAdapter(this);
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        dialogFragment = new FragmentChangeCity();
-//        fragmentMainCurrentCityWeather =new FragmentMainCurrentCityWeather();
-
-//        //Загрузка начального фрагмента
-//        FragmentTransaction ftrans = getSupportFragmentManager().beginTransaction();
-//        ftrans.replace(R.id.frameLayoutForFragment, fragmentMainCurrentCityWeather);
-//        ftrans.commit();
+//        dialogFragment = new FragmentChangeCity();
 
         //Загрузка фрагментов через ViewPager
         viewPager = findViewById(R.id.viewPagerMain);
-        pagerAdapter = new MyPagerAdapter(getSupportFragmentManager(), weatherDataSource);  //Создаём адаптер для ViewPager и передаём ему объект для работы с БД
+        pagerAdapter = new MyPagerAdapter(this, getSupportFragmentManager(),dataAdapter);  //Создаём адаптер для ViewPager и передаём ему объект для работы с БД
         viewPager.setAdapter(pagerAdapter);
-
 
         //Обработка FAB
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dialogFragment.show(getSupportFragmentManager(), "changeCity");
+//                dialogFragment.show(getSupportFragmentManager(), "changeCity");
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
             }
@@ -120,6 +106,12 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onDestroy() {
+        dataAdapter.closeDataAdapter();
+        super.onDestroy();
+    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -154,22 +146,13 @@ public class MainActivity extends AppCompatActivity
     //Метод обновления данных в БД по callback'у из фрагмента
     @Override
     public void updateCityDataToDB(String city, String country, float temp, float pressure, float humidity, float wind) {
-        weatherDataSource.updateWeather(city,country,temp,pressure,humidity,wind);
+//        weatherDataSource.updateWeather(city,country,temp,pressure,humidity,wind);
     }
 
     //Метод для получения данных из БД в оффлайне по последнему названию.
     @Override
     public CityCurrentWeatherModel getWeatherDataFromDBOffline(String name) {
-        return weatherDataSource.getCityWeatherDataFromDBByName(name);
-    }
-
-    //Метод передаёт название города во фрагмент для отображения
-    @Override
-    public void onCityChanged(String newCity) {
-        Log.d(TAG, "onCityChanged: New City: " + newCity);
-        CommonMethods.storeToSharedCrypto(this, CURRENT_CITY_KEY_VALUE, newCity);   //Сохранение текущего города в SharedPreferences
-        viewPager.setCurrentItem();
-        pagerAdapter.notifyDataSetChanged();
-//        fragmentMainCurrentCityWeather.updateWeatherData(newCity);
+//        return weatherDataSource.getCityWeatherDataFromDBByName(name);
+       return dataAdapter.getCityModel(0,name);
     }
 }

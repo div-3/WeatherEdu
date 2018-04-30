@@ -4,34 +4,77 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.widget.Toast;
+import android.util.Log;
 
 import com.d.ivan.weatheredu.db.WeatherDataSource;
 import com.d.ivan.weatheredu.model.CityCurrentWeatherModel;
 import com.d.ivan.weatheredu.services.WeatherLoaderService;
+import com.d.ivan.weatheredu.viewPager.MyPagerAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 public class DataAdapter {
+    private static final String TAG = "DataAdapter";
     Context context;
     WeatherDataSource dataBase;
 
+    MyPagerAdapter pagerAdapter;
+
+    CityCurrentWeatherModel modelMain;
+
+
     //Тестовые флаги
-    private static final boolean serviceMode =true; //Переключатель получения данных от сервиса или непосредственно от сервера
+    private static final boolean serviceMode =false; //Переключатель получения данных от сервиса или непосредственно от сервера
 
     //Для работы с сервисом
     private BroadcastReceiver br;   //BroadCastReceiver для работы с сервисом
     public static final String BROADCAST_ACTION = "com.d.ivan.weatheredu.WEATHER_LOADER_SERVICE";
     public static final String CITY = "City";
 
-    DataAdapter(Context context, WeatherDataSource weatherDataSource){
+    DataAdapter(Context context){
         this.context = context;
-        this.dataBase = weatherDataSource;
+
+        //Создаём объект источника данных для БД
+        this.dataBase = new WeatherDataSource(this.context);
+        this.dataBase.open();
     }
+
+    //Закрытие DataAdapter
+    public void closeDataAdapter(){
+        closeService();
+        closeDB();
+    }
+
     public CityCurrentWeatherModel getCityModel(int pageId, String cityName){
-
+        CityCurrentWeatherModel tempModel;
+        tempModel = downloadCityModel(cityName);
+        return tempModel;
     }
 
+    public void setModelMain(CityCurrentWeatherModel modelMain) {
+        this.modelMain = modelMain;
+    }
+
+    public void setPagerAdapter(MyPagerAdapter pagerAdapter) {
+        this.pagerAdapter = pagerAdapter;
+    }
+
+    //Метод добавления нового города в указанную позицию в БД с указанным именем
+    public void addNewCityToPosition(int position, String city){
+        CityCurrentWeatherModel model = this.getCityModel(dataBase.getCityCountFromDB()+1, city);
+        dataBase.addWeatherData(model);
+        Log.d(TAG, "addNewCityToPosition: ");
+    }
+
+    //Возвращает количество строк с городами в БД
+    public int getDbRawNumber(){
+        return dataBase.getCityCountFromDB();
+    }
+
+    //Возвращает название города из конкретной строки в БД
+    public String getCityNameFromDBByNumber(int position){
+        return dataBase.getCityNameFromDBByNumber(position);
+    }
 
     private CityCurrentWeatherModel downloadCityModel(final String city){
 
@@ -41,14 +84,15 @@ public class DataAdapter {
                 //Работа через непосредственный запрос к серверу
                 if (!serviceMode) {
                     //Получение и парсинг данных от сервера в модель
-                    final CityCurrentWeatherModel model = CurrentWeatherDataLoader.getCurrentWeatherByCityName(city);   //Получение данных из сети напрямую из приложения
+                    final CityCurrentWeatherModel modelServer = CurrentWeatherDataLoader.getCurrentWeatherByCityName(city);   //Получение данных из сети напрямую из приложения
 
                     //Обновление при работе не через сервис
                     // Вызов методов напрямую может вызвать runtime error
                     // Мы не можем напрямую обновить UI, поэтому используем handler, чтобы обновить интерфейс в главном потоке.
-                    if (model == null) {
+                    if (modelServer == null) {
                     } else {
                     }
+                    setModelMain(modelServer);
                 }
 
 
@@ -70,26 +114,15 @@ public class DataAdapter {
                         public void onReceive(Context context, Intent intent) {
                             String rawWeatherData = intent.getStringExtra(CITY);    //Получаем данные из BR
 
-                            final CityCurrentWeatherModel model = parseJsonWeatherData(rawWeatherData);   //Парсинг JSON-строки с погодой в модель
+                            final CityCurrentWeatherModel modelService = parseJsonWeatherData(rawWeatherData);   //Парсинг JSON-строки с погодой в модель
 
                             // Отрисовка на UI новых погодных данных
                             // Вызов методов напрямую может вызвать runtime error
                             // Мы не можем напрямую обновить UI, поэтому используем handler, чтобы обновить интерфейс в главном потоке.
-                            if (model == null) {
-//                                handler.post(new Runnable() {
-//                                    public void run() {
-//                                        Toast.makeText(getActivity().getApplicationContext(), getString(R.string.place_not_found),
-//                                                Toast.LENGTH_LONG).show();
-//                                    }
-//                                });
+                            if (modelService == null) {
                             } else {
-//                                //Отрисовка информации о выбранном городе
-//                                handler.post(new Runnable() {
-//                                    public void run() {
-//                                        renderWeather(model);
-//                                    }
-//                                });
                             }
+                            setModelMain(modelService);
 
                             //отписываемся от BroadcastReceiver
                             context.unregisterReceiver(br);
@@ -103,10 +136,11 @@ public class DataAdapter {
                     IntentFilter intentFilter = new IntentFilter(BROADCAST_ACTION);
 
                     //Регистрируем ресивер и предаём ему строку фильтра
-                    context.registerReceiver(br,intentFilter);
+                    context.registerReceiver(br, intentFilter);
                 }
             }
         }.start();
+        return this.modelMain;
     }
 
 
@@ -125,6 +159,11 @@ public class DataAdapter {
         return model;
     }
 
+    public void onCityChanged(String city){
+        pagerAdapter.onCityChanged(city);
+    }
+
+
     //Закрытие сервиса
     private void closeService(){
         Intent intent = new Intent(context, WeatherLoaderService.class);  //Подготавливаем интент для подключения к сервису
@@ -134,4 +173,11 @@ public class DataAdapter {
             e.printStackTrace();
         }
     }
+
+    //Закрытие базы данных
+    private void closeDB(){
+        this.dataBase.close();
+    }
+
+
 }

@@ -15,6 +15,8 @@ import android.widget.ListView;
 
 public class FragmentChangeCity extends DialogFragment implements AdapterView.OnItemClickListener {
 
+    private DataAdapter dataAdapter;
+
     String[] cities = { "Irkutsk", "Moscow", "Ottawa", "Beijing", "Havana", "Prague",
             "Paris", "London", "Honolulu", "Rome", "Luxemburg" };
     ListView listView;
@@ -22,19 +24,20 @@ public class FragmentChangeCity extends DialogFragment implements AdapterView.On
     private static final String TAG = "FrChangeCity";
 
     //Определяем интерфейс для связи фрагмента с активностью
-    public interface OnCityChangeListener{
-        void onCityChanged(String newCity);
-    }
+//    public interface OnCityChangeListener{
+//        void onCityChanged(String newCity);
+//    }
 
-    //Создание экземпляра интерфейса для передачи данных в callback'е активности
-    OnCityChangeListener mCallback;
+//    //Создание экземпляра интерфейса для передачи данных в callback'е активности
+//    OnCityChangeListener mCallback;
 
     //Метод создания фрагмента для ViewPager
-    public static FragmentChangeCity newInstance (){
+    public static FragmentChangeCity newInstance (DataAdapter da){
         FragmentChangeCity fragmentChangeCity = new FragmentChangeCity();
 //        Bundle args = new Bundle();
 //        args.putString(CURRENT_CITY_KEY_VALUE, city);
 //        fragmentMainCurrentCityWeather.setArguments(args);
+        fragmentChangeCity.setDataAdapter(da);
         return fragmentChangeCity;
     }
 
@@ -60,25 +63,18 @@ public class FragmentChangeCity extends DialogFragment implements AdapterView.On
         listView.setOnItemClickListener(this);
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        // This makes sure that the container activity has implemented
-        // the callback interface. If not, it throws an exception
-        try {
-            mCallback = (OnCityChangeListener) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString()
-                    + " must implement OnHeadlineSelectedListener");
-        }
-    }
 
     //Callback для активности с новым выбранным городом
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         dismiss();
         Log.d(TAG, "onItemClick: Selected Item: " + adapterView.getAdapter().getItem(i).toString());
-        mCallback.onCityChanged(adapterView.getAdapter().getItem(i).toString());
+//        mCallback.onCityChanged(adapterView.getAdapter().getItem(i).toString());
+        dataAdapter.onCityChanged(adapterView.getAdapter().getItem(i).toString());
 
+    }
+
+    public void setDataAdapter(DataAdapter dataAdapter) {
+        this.dataAdapter = dataAdapter;
     }
 }

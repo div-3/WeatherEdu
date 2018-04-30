@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.d.ivan.weatheredu.model.CityCurrentWeatherModel;
 
@@ -42,52 +43,45 @@ public class WeatherDataSource {
     }
 
     //Добавление новой строки города в БД
-    public WeatherData addWeatherData(  String city,
-                                        String country,
-                                        float temp,
-                                        float pressure,
-                                        float humidity,
-                                        float wind) {
+    public void addWeatherData(CityCurrentWeatherModel model) {
         //Создаём временных MAP (ContentValue) и засовываем в неё данные по городу
         ContentValues values = new ContentValues();
-        values.put(WeatherDBHelper.COLUMN_CITY, city);
-        values.put(WeatherDBHelper.COLUMN_COUNTRY, country);
-        values.put(WeatherDBHelper.COLUMN_CURRENT_TEMP, temp);
-        values.put(WeatherDBHelper.COLUMN_PRESSURE, pressure);
-        values.put(WeatherDBHelper.COLUMN_HUMIDITY, humidity);
-        values.put(WeatherDBHelper.COLUMN_WIND, wind);
+        values.put(WeatherDBHelper.COLUMN_CITY, model.name);
+        values.put(WeatherDBHelper.COLUMN_COUNTRY, model.sys.country);
+        values.put(WeatherDBHelper.COLUMN_CURRENT_TEMP, model.main.temp);
+        values.put(WeatherDBHelper.COLUMN_PRESSURE, model.main.pressure);
+        values.put(WeatherDBHelper.COLUMN_HUMIDITY, model.main.humidity);
+        values.put(WeatherDBHelper.COLUMN_WIND, model.wind.speed);
 
         //Добавление в БД кортежа из ContentValue, метод возвращает ID, в который вставил
-        long insertId = sqLiteDatabase.insert(WeatherDBHelper.TABLE_WEATHER, null, values);
+//        long insertId =
+                sqLiteDatabase.insert(WeatherDBHelper.TABLE_WEATHER, null, values);
 
-        WeatherData weatherData = new WeatherData();
-        weatherData.setCity(city);
-        weatherData.setCountry(country);
-        weatherData.setTemp(temp);
-        weatherData.setPressure(pressure);
-        weatherData.setHumidity(humidity);
-        weatherData.setWind(wind);
-        weatherData.setId(insertId);
-
-        return weatherData;
+        Log.d(TAG, "addWeatherData: ");
+//        WeatherData weatherData = new WeatherData();
+//        weatherData.setCity(city);
+//        weatherData.setCountry(country);
+//        weatherData.setTemp(temp);
+//        weatherData.setPressure(pressure);
+//        weatherData.setHumidity(humidity);
+//        weatherData.setWind(wind);
+//        weatherData.setId(insertId);
+//
+//        return weatherData;
     }
 
     public void updateWeather (int id,
-                               String city,
-                               String country,
-                               float temp,
-                               float pressure,
-                               float humidity,
-                               float wind){
+                               CityCurrentWeatherModel model){
 
-        ContentValues updatedWeather = new ContentValues();
+        id++;   //инкримент, т.к. в бд всё ачинается с 1.
+        ContentValues values = new ContentValues();
 
-        updatedWeather.put(WeatherDBHelper.COLUMN_CITY, city);
-        updatedWeather.put(WeatherDBHelper.COLUMN_COUNTRY, country);
-        updatedWeather.put(WeatherDBHelper.COLUMN_CURRENT_TEMP, temp);
-        updatedWeather.put(WeatherDBHelper.COLUMN_PRESSURE, pressure);
-        updatedWeather.put(WeatherDBHelper.COLUMN_HUMIDITY, humidity);
-        updatedWeather.put(WeatherDBHelper.COLUMN_WIND, wind);
+        values.put(WeatherDBHelper.COLUMN_CITY, model.name);
+        values.put(WeatherDBHelper.COLUMN_COUNTRY, model.sys.country);
+        values.put(WeatherDBHelper.COLUMN_CURRENT_TEMP, model.main.temp);
+        values.put(WeatherDBHelper.COLUMN_PRESSURE, model.main.pressure);
+        values.put(WeatherDBHelper.COLUMN_HUMIDITY, model.main.humidity);
+        values.put(WeatherDBHelper.COLUMN_WIND, model.wind.speed);
 
         //Обновляем данные в БД. Метод update возвращает нам кол-во обновленных записей
        int nbr = 0;
@@ -99,16 +93,14 @@ public class WeatherDataSource {
 //                   weatherDBHelper.COLUMN_CITY + "=" + city,
 //                   null);
             //Этот вариант обновления записи заработал нормально.
-            nbr = sqLiteDatabase.update(weatherDBHelper.TABLE_WEATHER,
-                    updatedWeather,
-                    weatherDBHelper.COLUMN_ID + "=?",
-                    new String[]{String.valueOf(id)});
+            nbr = sqLiteDatabase.update(weatherDBHelper.TABLE_WEATHER, values,
+                    weatherDBHelper.COLUMN_ID + "=?", new String[]{String.valueOf(id)});
        } catch (Exception e){
            e.printStackTrace();
        }
         //Если ни одной записи не было обновлено, то добавляем новый кортеж в таблицу БД
         if (nbr == 0){
-            addWeatherData(city,country,temp,pressure,humidity,wind);
+            addWeatherData(model);
         }
     }
 

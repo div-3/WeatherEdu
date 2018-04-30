@@ -36,8 +36,6 @@ public class FragmentMainCurrentCityWeather extends Fragment {
     // выполнение какого-то метода. Второй случай наш.
     private final Handler handler = new Handler();
 
-    //Тестовые флаги
-    private boolean serviceMode = true;    //Если работаем через сервис, иначе через непосредственый запрос погодных данных от сервера
 
     //Вьюшки
     private ImageView iv;
@@ -48,13 +46,11 @@ public class FragmentMainCurrentCityWeather extends Fragment {
     private TextView tvWindValue;
 
     private String currentCity;
-    private static final String CURRENT_CITY_KEY_VALUE = "CURRENT_CITY";
+
     private final String DEFAULT_CITY = "CURRENT_CITY";
 
-    //Для работы с сервисом
-    private BroadcastReceiver br;   //BroadCastReceiver для работы с сервисом
-    public static final String BROADCAST_ACTION = "com.d.ivan.weatheredu.WEATHER_LOADER_SERVICE";
-    public static final String CITY = "City";
+
+
 
     private static final String TAG = "FrCurrCityWeather";
 
@@ -73,7 +69,7 @@ public class FragmentMainCurrentCityWeather extends Fragment {
     public static FragmentMainCurrentCityWeather newInstance (String city){
         FragmentMainCurrentCityWeather fragmentMainCurrentCityWeather = new FragmentMainCurrentCityWeather();
         Bundle args = new Bundle();
-        args.putString(CURRENT_CITY_KEY_VALUE, city);
+        args.putString(MainActivity.CURRENT_CITY_KEY_VALUE, city);
         fragmentMainCurrentCityWeather.setArguments(args);
         return fragmentMainCurrentCityWeather;
     }
@@ -84,7 +80,7 @@ public class FragmentMainCurrentCityWeather extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 //        //Загрузка ранее выбранного города или сохранённого из SharedPreferences
 //        if (currentCity == null) {
-//            String tmp = loadSharedCrypto(CURRENT_CITY_KEY_VALUE);
+//            String tmp = loadSharedCrypto(MainActivity.CURRENT_CITY_KEY_VALUE);
 //            if (tmp != null){
 //                CityCurrentWeatherModel model = mCallback.getWeatherDataFromDBOffline(tmp);
 //                renderWeather(model);
@@ -94,8 +90,8 @@ public class FragmentMainCurrentCityWeather extends Fragment {
 //            updateWeatherData(currentCity);
 //        }
         //Получение города, переданного от ViewPager
-        if (getArguments().getString(CURRENT_CITY_KEY_VALUE) != null) {
-            currentCity = getArguments().getString(CURRENT_CITY_KEY_VALUE);
+        if (getArguments().getString(MainActivity.CURRENT_CITY_KEY_VALUE) != null) {
+            currentCity = getArguments().getString(MainActivity.CURRENT_CITY_KEY_VALUE);
         }
         return inflater.inflate(R.layout.fragment_main_current_city_weather, container, false);
     }
@@ -161,7 +157,6 @@ public class FragmentMainCurrentCityWeather extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        closeService();
     }
 
     //Callback для активности, если что-то произошло при загрузке данных
@@ -176,93 +171,23 @@ public class FragmentMainCurrentCityWeather extends Fragment {
 //            currentCity = city;
 
             //Сохранение названия города в SharedPreferences
-            CommonMethods.storeToSharedCrypto(getActivity(), CURRENT_CITY_KEY_VALUE, currentCity);
+//            CommonMethods.storeToSharedCrypto(getActivity(), MainActivity.CURRENT_CITY_KEY_VALUE, currentCity);
 
-            new Thread() {//Отдельный поток для получения новых данных в фоне
-                public void run() {
-
-                    //Работа через непосредственный запрос к серверу
-                    if (!serviceMode) {
-                        //Получение и парсинг данных от сервера в модель
-                        final CityCurrentWeatherModel model = CurrentWeatherDataLoader.getCurrentWeatherByCityName(city);   //Получение данных из сети напрямую из приложения
-
-                        //Обновление при работе не через сервис
-                        // Вызов методов напрямую может вызвать runtime error
-                        // Мы не можем напрямую обновить UI, поэтому используем handler, чтобы обновить интерфейс в главном потоке.
-                        if (model == null) {
-                            handler.post(new Runnable() {
-                                public void run() {
-                                    Toast.makeText(getActivity().getApplicationContext(), getString(R.string.place_not_found),
-                                            Toast.LENGTH_LONG).show();
-                                }
-                            });
-                        } else {
-
-                            //Отрисовка информации о выбранном городе
-                            handler.post(new Runnable() {
-                                public void run() {
-                                    renderWeather(model);
-                                }
-                            });
-                        }
+            if (model == null) {
+//                                handler.post(new Runnable() {
+//                                    public void run() {
+//                                        Toast.makeText(getActivity().getApplicationContext(), getString(R.string.place_not_found),
+//                                                Toast.LENGTH_LONG).show();
+//                                    }
+//                                });
+            } else {
+                //Отрисовка информации о выбранном городе
+                handler.post(new Runnable() {
+                    public void run() {
+                        renderWeather(model);
                     }
-
-
-                    //Работа с сервисом для получения данных о погоде.
-                    if (serviceMode){
-
-                        //Запускаем сервис
-                        Intent intent = new Intent(getActivity(), WeatherLoaderService.class);  //Подготавливаем интент для подключения к сервису
-                        intent.putExtra("City", city);  //передаём в интент название города
-                        try {
-                            getActivity().startService(intent); //запускаем сервис
-                        } catch (Exception e){
-                            e.printStackTrace();
-                        }
-
-                        //Обновление интерфейса при работе через сервис будет происходить при получении данных от сервиса через BroadCastReceiver.
-                        br = new BroadcastReceiver() {
-                            @Override
-                            public void onReceive(Context context, Intent intent) {
-                                String rawWeatherData = intent.getStringExtra(CITY);    //Получаем данные из BR
-
-                                final CityCurrentWeatherModel model = parseJsonWeatherData(rawWeatherData);   //Парсинг JSON-строки с погодой в модель
-
-                                // Отрисовка на UI новых погодных данных
-                                // Вызов методов напрямую может вызвать runtime error
-                                // Мы не можем напрямую обновить UI, поэтому используем handler, чтобы обновить интерфейс в главном потоке.
-                                if (model == null) {
-                                    handler.post(new Runnable() {
-                                        public void run() {
-                                            Toast.makeText(getActivity().getApplicationContext(), getString(R.string.place_not_found),
-                                                    Toast.LENGTH_LONG).show();
-                                        }
-                                    });
-                                } else {
-                                    //Отрисовка информации о выбранном городе
-                                    handler.post(new Runnable() {
-                                        public void run() {
-                                            renderWeather(model);
-                                        }
-                                    });
-                                }
-
-                                //отписываемся от BroadcastReceiver
-                                getActivity().unregisterReceiver(br);
-
-                                //Закрываем сервис
-                                closeService();
-                            }
-                        };
-
-                        //Создаём фильтр для BroadcastReceiver
-                        IntentFilter intentFilter = new IntentFilter(BROADCAST_ACTION);
-
-                        //Регистрируем ресивер и предаём ему строку фильтра
-                        getActivity().registerReceiver(br,intentFilter);
-                    }
-                }
-            }.start();
+                });
+            }
         }
     }
 
@@ -318,28 +243,7 @@ public class FragmentMainCurrentCityWeather extends Fragment {
         return false;
     }
 
-    //Метод для парсинга JSON-строки с данными о погоде от сервера в объект модели погоды города
-    private CityCurrentWeatherModel parseJsonWeatherData(String rawData){
-        //Преобразуем полученную JSON-строку с объект класса CityCurrentWeatherModel c помощью библиотеки GSON
-        final int ALL_GOOD = 200;    //Код в ответе сервера, что всё хорошо
-        GsonBuilder builder = new GsonBuilder();
-        Gson gson = builder.create();
-        CityCurrentWeatherModel model = gson.fromJson(rawData, CityCurrentWeatherModel.class);
 
-        //Проверка, что сервер правильно понял запрос и ответил кодом "200". Все коды REST-запросов http://www.restapitutorial.com/httpstatuscodes.html
-        if (model.cod != ALL_GOOD) {
-            return null;
-        }
-        return model;
-    }
 
-    //Закрытие сервиса
-    private void closeService(){
-        Intent intent = new Intent(getActivity(), WeatherLoaderService.class);  //Подготавливаем интент для подключения к сервису
-        try {
-            getActivity().stopService(intent); //Останавливаем сервис
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }
+
 }

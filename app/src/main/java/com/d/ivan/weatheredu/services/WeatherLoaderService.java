@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 
+import com.d.ivan.weatheredu.DataAdapter;
 import com.d.ivan.weatheredu.FragmentMainCurrentCityWeather;
 
 import java.net.URL;
@@ -47,8 +48,8 @@ public class WeatherLoaderService extends IntentService {
             //Если строка не нулевая, то отправляем её широковещательно
             if (!rawCurrentWeatherData.isEmpty()){
                 Intent sendMSG = new Intent();
-                sendMSG.setAction(FragmentMainCurrentCityWeather.BROADCAST_ACTION);
-                sendMSG.putExtra(FragmentMainCurrentCityWeather.CITY, rawCurrentWeatherData);
+                sendMSG.setAction(DataAdapter.BROADCAST_ACTION);
+                sendMSG.putExtra(DataAdapter.CITY, rawCurrentWeatherData);
                 sendBroadcast(sendMSG);
             }
 

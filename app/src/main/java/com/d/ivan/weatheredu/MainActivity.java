@@ -18,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.d.ivan.weatheredu.commonMethods.CommonMethods;
 import com.d.ivan.weatheredu.db.WeatherDataSource;
 import com.d.ivan.weatheredu.model.CityCurrentWeatherModel;
 import com.d.ivan.weatheredu.viewPager.MyPagerAdapter;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity
     private DialogFragment dialogFragment;
     private FragmentMainCurrentCityWeather fragmentMainCurrentCityWeather;
     private final static String TAG = "MainActivity";
+    public static final String CURRENT_CITY_KEY_VALUE = "CURRENT_CITY";
 
     //Для работы с ViewPager
     private ViewPager viewPager;
@@ -165,6 +167,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onCityChanged(String newCity) {
         Log.d(TAG, "onCityChanged: New City: " + newCity);
-        fragmentMainCurrentCityWeather.updateWeatherData(newCity);
+        CommonMethods.storeToSharedCrypto(this, CURRENT_CITY_KEY_VALUE, newCity);   //Сохранение текущего города в SharedPreferences
+        viewPager.setCurrentItem();
+        pagerAdapter.notifyDataSetChanged();
+//        fragmentMainCurrentCityWeather.updateWeatherData(newCity);
     }
 }

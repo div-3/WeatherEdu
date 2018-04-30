@@ -12,11 +12,14 @@ import com.d.ivan.weatheredu.FragmentChangeCity;
 import com.d.ivan.weatheredu.FragmentMainCurrentCityWeather;
 import com.d.ivan.weatheredu.db.WeatherDataSource;
 
+import java.util.Map;
+
 public class MyPagerAdapter extends FragmentPagerAdapter {
 
     private static final String TAG = "MyPagerAdapter";
     private int pageCount = 0;      //Количество загруженных ранее городов
     private int prevousPosition =0; //Позиция во ViewPager, на которой пользователь остановился
+    private Map<Integer, String> newCitiesPages;    //Map новых добавленных городов, которые надо
 
     //Для работы с БД
     private WeatherDataSource dataBase;
@@ -49,5 +52,7 @@ public class MyPagerAdapter extends FragmentPagerAdapter {
     }
 
     //Адаптер определяет какой город был выбран последним.
+
+    //Метод для получения последнего
 
 }

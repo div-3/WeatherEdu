@@ -72,7 +72,8 @@ public class WeatherDataSource {
         return weatherData;
     }
 
-    public void updateWeather (String city,
+    public void updateWeather (int id,
+                               String city,
                                String country,
                                float temp,
                                float pressure,
@@ -81,7 +82,7 @@ public class WeatherDataSource {
 
         ContentValues updatedWeather = new ContentValues();
 
-        //updatedWeather.put(WeatherDBHelper.COLUMN_CITY, city);
+        updatedWeather.put(WeatherDBHelper.COLUMN_CITY, city);
         updatedWeather.put(WeatherDBHelper.COLUMN_COUNTRY, country);
         updatedWeather.put(WeatherDBHelper.COLUMN_CURRENT_TEMP, temp);
         updatedWeather.put(WeatherDBHelper.COLUMN_PRESSURE, pressure);
@@ -100,8 +101,8 @@ public class WeatherDataSource {
             //Этот вариант обновления записи заработал нормально.
             nbr = sqLiteDatabase.update(weatherDBHelper.TABLE_WEATHER,
                     updatedWeather,
-                    weatherDBHelper.COLUMN_CITY + "=?",
-                    new String[]{city});
+                    weatherDBHelper.COLUMN_ID + "=?",
+                    new String[]{String.valueOf(id)});
        } catch (Exception e){
            e.printStackTrace();
        }

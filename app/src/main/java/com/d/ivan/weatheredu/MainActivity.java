@@ -4,8 +4,6 @@ package com.d.ivan.weatheredu;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
@@ -18,8 +16,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.d.ivan.weatheredu.DB.WeatherDataSource;
-import com.d.ivan.weatheredu.Model.CityCurrentWeatherModel;
+import com.d.ivan.weatheredu.db.WeatherDataSource;
+import com.d.ivan.weatheredu.model.CityCurrentWeatherModel;
 
 
 public class MainActivity extends AppCompatActivity

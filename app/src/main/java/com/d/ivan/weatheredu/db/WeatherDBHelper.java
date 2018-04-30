@@ -1,9 +1,8 @@
-package com.d.ivan.weatheredu.DB;
+package com.d.ivan.weatheredu.db;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 //Определяем специальный класс для работы с БД SQLite
 public class WeatherDBHelper extends SQLiteOpenHelper {

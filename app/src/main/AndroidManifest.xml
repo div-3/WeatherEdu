@@ -25,7 +25,7 @@
         </activity>
 
         <service
-            android:name=".Services.WeatherLoaderService"
+            android:name=".services.WeatherLoaderService"
             android:exported="false" />
     </application>
 

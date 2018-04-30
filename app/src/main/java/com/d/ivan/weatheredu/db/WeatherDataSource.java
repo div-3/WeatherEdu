@@ -1,14 +1,12 @@
-package com.d.ivan.weatheredu.DB;
+package com.d.ivan.weatheredu.db;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
-import com.d.ivan.weatheredu.Model.CityCurrentWeatherModel;
-import com.d.ivan.weatheredu.Model.CurrentWeatherWeather;
+import com.d.ivan.weatheredu.model.CityCurrentWeatherModel;
 
 import java.util.ArrayList;
 import java.util.List;

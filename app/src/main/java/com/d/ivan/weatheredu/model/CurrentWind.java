@@ -1,4 +1,4 @@
-package com.d.ivan.weatheredu.Model;
+package com.d.ivan.weatheredu.model;
 
 public class CurrentWind {
     public double speed;

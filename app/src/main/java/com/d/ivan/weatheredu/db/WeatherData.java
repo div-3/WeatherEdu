@@ -1,4 +1,4 @@
-package com.d.ivan.weatheredu.DB;
+package com.d.ivan.weatheredu.db;
 
 //Описание одного кортежа (записи) в БД
 public class WeatherData {

@@ -18,8 +18,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.d.ivan.weatheredu.Model.CityCurrentWeatherModel;
-import com.d.ivan.weatheredu.Services.WeatherLoaderService;
+import com.d.ivan.weatheredu.model.CityCurrentWeatherModel;
+import com.d.ivan.weatheredu.services.WeatherLoaderService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

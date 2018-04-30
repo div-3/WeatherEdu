@@ -1,4 +1,4 @@
-package com.d.ivan.weatheredu.Services;
+package com.d.ivan.weatheredu.services;
 
 import android.app.IntentService;
 import android.content.Intent;

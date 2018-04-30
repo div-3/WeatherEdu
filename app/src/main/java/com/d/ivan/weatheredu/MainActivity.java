@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -18,6 +20,7 @@ import android.view.MenuItem;
 
 import com.d.ivan.weatheredu.db.WeatherDataSource;
 import com.d.ivan.weatheredu.model.CityCurrentWeatherModel;
+import com.d.ivan.weatheredu.viewPager.MyPagerAdapter;
 
 
 public class MainActivity extends AppCompatActivity
@@ -28,6 +31,10 @@ public class MainActivity extends AppCompatActivity
     private DialogFragment dialogFragment;
     private FragmentMainCurrentCityWeather fragmentMainCurrentCityWeather;
     private final static String TAG = "MainActivity";
+
+    //Для работы с ViewPager
+    private ViewPager viewPager;
+    private PagerAdapter pagerAdapter;
 
     //Для работы с БД
     private WeatherDataSource weatherDataSource;
@@ -45,12 +52,18 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         dialogFragment = new FragmentChangeCity();
-        fragmentMainCurrentCityWeather =new FragmentMainCurrentCityWeather();
+//        fragmentMainCurrentCityWeather =new FragmentMainCurrentCityWeather();
 
-        //Загрузка начального фрагмента
-        FragmentTransaction ftrans = getSupportFragmentManager().beginTransaction();
-        ftrans.replace(R.id.frameLayoutForFragment, fragmentMainCurrentCityWeather);
-        ftrans.commit();
+//        //Загрузка начального фрагмента
+//        FragmentTransaction ftrans = getSupportFragmentManager().beginTransaction();
+//        ftrans.replace(R.id.frameLayoutForFragment, fragmentMainCurrentCityWeather);
+//        ftrans.commit();
+
+        //Загрузка фрагментов через ViewPager
+        viewPager = findViewById(R.id.viewPagerMain);
+        pagerAdapter = new MyPagerAdapter(getSupportFragmentManager(), weatherDataSource);  //Создаём адаптер для ViewPager и передаём ему объект для работы с БД
+        viewPager.setAdapter(pagerAdapter);
+
 
         //Обработка FAB
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -147,7 +160,6 @@ public class MainActivity extends AppCompatActivity
     public CityCurrentWeatherModel getWeatherDataFromDBOffline(String name) {
         return weatherDataSource.getCityWeatherDataFromDBByName(name);
     }
-
 
     //Метод передаёт название города во фрагмент для отображения
     @Override

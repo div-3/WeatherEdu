@@ -18,14 +18,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.d.ivan.weatheredu.commonMethods.CommonMethods;
 import com.d.ivan.weatheredu.model.CityCurrentWeatherModel;
 import com.d.ivan.weatheredu.services.WeatherLoaderService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.util.Locale;
-
-
 
 // Взаимодействие с родительской активити через callback интерфейс.
 // Туториал Communicating with Other Fragments https://developer.android.com/training/basics/fragments/communicating.html
@@ -49,7 +48,7 @@ public class FragmentMainCurrentCityWeather extends Fragment {
     private TextView tvWindValue;
 
     private String currentCity;
-    private final String CURRENT_CITY_KEY_VALUE = "CURRENT_CITY";
+    private static final String CURRENT_CITY_KEY_VALUE = "CURRENT_CITY";
     private final String DEFAULT_CITY = "CURRENT_CITY";
 
     //Для работы с сервисом
@@ -70,6 +69,14 @@ public class FragmentMainCurrentCityWeather extends Fragment {
     //Создание экземпляра интерфейса для передачи данных в callback'е активности
     OnCurrentCityChangeListener mCallback;
 
+    //Метод создания фрагмента для ViewPager
+    public static FragmentMainCurrentCityWeather newInstance (String city){
+        FragmentMainCurrentCityWeather fragmentMainCurrentCityWeather = new FragmentMainCurrentCityWeather();
+        Bundle args = new Bundle();
+        args.putString(CURRENT_CITY_KEY_VALUE, city);
+        fragmentMainCurrentCityWeather.setArguments(args);
+        return fragmentMainCurrentCityWeather;
+    }
 
     //Привязка к разметке
     @Nullable
@@ -86,6 +93,10 @@ public class FragmentMainCurrentCityWeather extends Fragment {
 //        } else {
 //            updateWeatherData(currentCity);
 //        }
+        //Получение города, переданного от ViewPager
+        if (getArguments().getString(CURRENT_CITY_KEY_VALUE) != null) {
+            currentCity = getArguments().getString(CURRENT_CITY_KEY_VALUE);
+        }
         return inflater.inflate(R.layout.fragment_main_current_city_weather, container, false);
     }
 
@@ -99,22 +110,31 @@ public class FragmentMainCurrentCityWeather extends Fragment {
         tvHumidityValue = (TextView) getActivity().findViewById(R.id.tvHumidityValue);
         tvWindValue = (TextView) getActivity().findViewById(R.id.tvWindValue);
 
-        //Загрузка ранее выбранного города или сохранённого из SharedPreferences
-        if (currentCity == null) {
-            String tmp = loadSharedCrypto(CURRENT_CITY_KEY_VALUE);
-            if (tmp != null){
-                CityCurrentWeatherModel model = mCallback.getWeatherDataFromDBOffline(tmp);
-                renderWeather(model);
-//                updateWeatherData(tmp);
-            }
-        } else {
-            updateWeatherData(currentCity);
-        }
-
-
 //        //Загрузка ранее выбранного города или сохранённого из SharedPreferences
 //        if (currentCity == null) {
 //            String tmp = loadSharedCrypto(CURRENT_CITY_KEY_VALUE);
+//            if (tmp != null){
+//                CityCurrentWeatherModel model = mCallback.getWeatherDataFromDBOffline(tmp);
+//                renderWeather(model);
+////                updateWeatherData(tmp);
+//            }
+//        } else {
+//            updateWeatherData(currentCity);
+//        }
+
+        //Загрузка города, переданного от ViewPager
+        if (currentCity != null) {
+            CityCurrentWeatherModel model = mCallback.getWeatherDataFromDBOffline(currentCity); //Поиск данных города в БД
+            if(model != null){
+                renderWeather(model);   //Если нашли базе, то выводим инфу из БД
+            } else {
+                updateWeatherData(currentCity);     //Если не нашли в базе, то запрашиваем от сервака.
+            }
+        }
+
+//        //Загрузка ранее выбранного города или сохранённого из SharedPreferences
+//        if (currentCity == null) {
+//            String tmp = CommonMethods.loadSharedCrypto(getActivity(), CURRENT_CITY_KEY_VALUE);
 //            if (tmp != null){
 //                updateWeatherData(tmp);
 //            }
@@ -125,7 +145,6 @@ public class FragmentMainCurrentCityWeather extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
-
 
     //Проверка, что активность переопределила метод из интерфейса фрагмента
     @Override
@@ -154,10 +173,10 @@ public class FragmentMainCurrentCityWeather extends Fragment {
     public void updateWeatherData(final String city) {
 
         if (!city.isEmpty()) {
-            currentCity = city;
+//            currentCity = city;
 
             //Сохранение названия города в SharedPreferences
-            storeToSharedCrypto(CURRENT_CITY_KEY_VALUE, currentCity);
+            CommonMethods.storeToSharedCrypto(getActivity(), CURRENT_CITY_KEY_VALUE, currentCity);
 
             new Thread() {//Отдельный поток для получения новых данных в фоне
                 public void run() {
@@ -285,28 +304,6 @@ public class FragmentMainCurrentCityWeather extends Fragment {
              Log.d(TAG, "One or more fields not found in the JSON data");//FIXME Обработка ошибки
         }
 
-    }
-
-    //Метод сохранения данных в указанном файле SharedPreferences по указанному ключу
-    private boolean storeToSharedCrypto(String keyValue, String dataValue){
-
-        if (keyValue.isEmpty() || dataValue.isEmpty()) return false;
-
-        SharedPreferences sPrefs = getActivity().getSharedPreferences("FragmentMainCurrentWeatherData", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sPrefs.edit();
-        editor.putString(keyValue, dataValue);
-        editor.commit();
-        return true;
-    }
-
-    //Метод получения данных из указанного файла SharedPreferences по указанному ключу
-    private String loadSharedCrypto(String keyValue){
-
-        if (keyValue.isEmpty()) return null;
-
-        SharedPreferences sPrefs = getActivity().getSharedPreferences("FragmentMainCurrentWeatherData", Context.MODE_PRIVATE);
-
-        return sPrefs.getString(keyValue, null);
     }
 
     //Вывод иконки погоды с сайта в ImageView с помощью библиотеки Glide

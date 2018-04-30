@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.Nullable;
 
 import com.d.ivan.weatheredu.model.CityCurrentWeatherModel;
 
@@ -127,9 +128,10 @@ public class WeatherDataSource {
         return weatherData;
     }
 
-    //Возврат модели  годода из БД.
+    //Возврат модели  годода из БД по имени.
+    @Nullable
     public CityCurrentWeatherModel getCityWeatherDataFromDBByName(String name){
-        CityCurrentWeatherModel model = new CityCurrentWeatherModel();
+        CityCurrentWeatherModel model = null;
 
         Cursor cursor = sqLiteDatabase.query(weatherDBHelper.TABLE_WEATHER,
                 allWeatherColumns, weatherDBHelper.COLUMN_CITY + "=?",
@@ -137,6 +139,7 @@ public class WeatherDataSource {
 
         if (cursor.getCount() != 0) {
             cursor.moveToFirst();
+            model = new CityCurrentWeatherModel();
             WeatherData weatherDataTemp = cursorToWeather(cursor);
             model.name = weatherDataTemp.getCity();
             model.wind.speed = weatherDataTemp.getWind();
@@ -151,6 +154,34 @@ public class WeatherDataSource {
         // Обязательно закрыть курсор
         cursor.close();
         return model;
+    }
+
+    //Возврат названия годода из БД по номеру в списке
+    // Внимание! Нумерация в ЮД начинается с 1, поэтому надо прибавлять к индексу.
+    @Nullable
+    public String getCityNameFromDBByNumber(int numner){
+        String name = null;
+        numner++;
+        Cursor cursor = sqLiteDatabase.query(weatherDBHelper.TABLE_WEATHER,
+                allWeatherColumns, weatherDBHelper.COLUMN_ID + "=?",
+                new String[]{String.valueOf(numner)}, null, null, null);
+
+        if (cursor.getCount() != 0) {
+            cursor.moveToFirst();
+            WeatherData weatherDataTemp = cursorToWeather(cursor);
+            name = weatherDataTemp.getCity();
+        }
+        // Обязательно закрыть курсор
+        cursor.close();
+        return name;
+}
+
+    //Метод возвращает количество городов в базе
+    public int getCityCountFromDB(){
+        Cursor cursor = sqLiteDatabase.query(weatherDBHelper.TABLE_WEATHER,
+                allWeatherColumns, null,null, null, null, null);
+
+        return cursor.getCount();
     }
 
     private WeatherData cursorToWeather(Cursor cursor) {

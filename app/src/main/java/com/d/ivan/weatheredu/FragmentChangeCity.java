@@ -29,13 +29,22 @@ public class FragmentChangeCity extends DialogFragment implements AdapterView.On
     //Создание экземпляра интерфейса для передачи данных в callback'е активности
     OnCityChangeListener mCallback;
 
+    //Метод создания фрагмента для ViewPager
+    public static FragmentChangeCity newInstance (){
+        FragmentChangeCity fragmentChangeCity = new FragmentChangeCity();
+//        Bundle args = new Bundle();
+//        args.putString(CURRENT_CITY_KEY_VALUE, city);
+//        fragmentMainCurrentCityWeather.setArguments(args);
+        return fragmentChangeCity;
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chang_city, container, false);
         listView = (ListView) view.findViewById(R.id.change_city_list_view);
 
-        getDialog().getWindow().setTitle("Chose City^");
+//        getDialog().getWindow().setTitle("Chose City^");
         return view;
     }
 
